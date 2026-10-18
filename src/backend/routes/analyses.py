@@ -22,6 +22,8 @@ analyses_store: list[dict] = []
 _seed_demo: bool = True
 if _seed_demo:
     from src.backend.core.verifier import analyze as _run
+    import datetime
+    
     _demo = _run(
         repo_url="github.com/renata89/verifAI",
         pr_number=42,
@@ -29,7 +31,10 @@ if _seed_demo:
         diff="def login(): pass",
         ac_text="1. User can register with email and password\n2. Password must be at least 8 characters\n3. Welcome email sent after registration",
     )
-    analyses_store.append(_demo.model_dump())
+    d = _demo.model_dump()
+    d["pr_title"] = "Add user authentication module"
+    d["timestamp"] = datetime.datetime.now().isoformat()
+    analyses_store.append(d)
 
     _demo2 = _run(
         repo_url="github.com/renata89/verifAI",
@@ -38,7 +43,10 @@ if _seed_demo:
         diff="from redis import Redis",
         ac_text="1. 100 requests per minute per API key\n2. Return X-RateLimit-* headers\n3. Configurable rate limit via env vars",
     )
-    analyses_store.append(_demo2.model_dump())
+    d2 = _demo2.model_dump()
+    d2["pr_title"] = "Add API rate limiting"
+    d2["timestamp"] = (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
+    analyses_store.append(d2)
 
 
 @router.get("/analyses")
