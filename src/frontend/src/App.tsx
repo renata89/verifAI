@@ -19,6 +19,8 @@ interface Analysis {
   timestamp?: string
 }
 
+import NewAnalysisView from './NewAnalysisView'
+
 const STATUS_EMOJI: Record<string, string> = {
   implemented: '✓',
   partial: '~',
@@ -33,7 +35,7 @@ const STATUS_LABEL: Record<string, string> = {
   wrong: 'Wrong',
 }
 
-type View = 'dashboard' | 'detail'
+type View = 'dashboard' | 'detail' | 'new-analysis'
 
 function App() {
   const [analyses, setAnalyses] = useState<Analysis[]>([])
@@ -93,7 +95,7 @@ function App() {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button className="verifai-btn verifai-btn--ghost" onClick={fetchAnalyses}>Refresh</button>
-            <button className="verifai-btn verifai-btn--primary">New Analysis</button>
+            <button className="verifai-btn verifai-btn--primary" onClick={() => setView('new-analysis')}>New Analysis</button>
           </div>
         </header>
 
@@ -242,6 +244,11 @@ function App() {
         </button>
       </div>
     )
+  }
+
+  // ── NEW ANALYSIS VIEW ──
+  if (view === 'new-analysis') {
+    return <NewAnalysisView onCreated={fetchAnalyses} onBack={() => setView('dashboard')} />
   }
 
   return null
