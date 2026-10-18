@@ -5,7 +5,7 @@ interface NewAnalysisProps {
   onBack: () => void
 }
 
-export default function NewAnalysisView({ onCreated, onBack }: NewAnalysisProps) {
+export default function NewAnalysisView({ onCreated: _onCreated, onBack }: NewAnalysisProps) {
   const [acText, setAcText] = useState('')
   const [codeDiff, setCodeDiff] = useState('')
   const [prTitle, setPrTitle] = useState('')
