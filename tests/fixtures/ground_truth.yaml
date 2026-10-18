@@ -1,0 +1,190 @@
+# VerifAI Ground Truth Dataset
+#
+# Each entry is a pair of (AC, Code, Expected Result)
+# Used to benchmark the LLM accuracy before shipping.
+#
+# Format:
+# - id: unique identifier
+# - ac: Acceptance Criteria text (what the business wants)
+# - code: Code snippet to analyze
+# - expected: Expected VerifAI verdict
+#   - ac_status: "implemented" | "partial" | "missing" | "wrong"
+#   - explanation: why this is the expected result
+
+fixtures:
+  - id: "GT-001"
+    language: python
+    ac: |
+      The API endpoint GET /users should return a paginated list of users.
+      Each user must include id, name, and email fields.
+      Response must support ?page= and ?per_page= query parameters.
+    code: |
+      @router.get("/users")
+      async def get_users(page: int = Query(1, ge=1), per_page: int = Query(20, ge=1, le=100)):
+          offset = (page - 1) * per_page
+          users = await db.fetch_all(
+              "SELECT id, name, email FROM users ORDER BY id LIMIT :limit OFFSET :offset",
+              {"limit": per_page, "offset": offset}
+          )
+          return {"users": [dict(u) for u in users], "page": page, "per_page": per_page}
+    expected:
+      ac_status: "implemented"
+      explanation: "Code implements paginated GET /users with id/name/email, supports page and per_page params."
+
+  - id: "GT-002"
+    language: python
+    ac: |
+      POST /users should create a new user.
+      Request body must contain name (string, required) and email (string, required, valid email format).
+      Returns 201 with created user data.
+      Returns 400 if validation fails.
+    code: |
+      @router.post("/users", status_code=201)
+      async def create_user(name: str = Body(...), email: str = Body(...)):
+          # Missing email validation
+          user_id = await db.execute(
+              "INSERT INTO users (name, email) VALUES (:name, :email)",
+              {"name": name, "email": email}
+          )
+          return {"id": user_id, "name": name, "email": email}
+    expected:
+      ac_status: "partial"
+      explanation: "Creates user with name/email and returns 201, but missing email format validation. Should return 400 on invalid email."
+
+  - id: "GT-003"
+    language: python
+    ac: |
+      Users should receive a welcome email after registration.
+      Email should contain their name and a verification link.
+    code: |
+      @router.post("/register")
+      async def register(name: str, email: str):
+          user_id = await db.execute(
+              "INSERT INTO users (name, email) VALUES (:name, :email)",
+              {"name": name, "email": email}
+          )
+          return {"id": user_id, "name": name, "email": email}
+    expected:
+      ac_status: "missing"
+      explanation: "User is registered but no welcome email is sent. No email service call exists."
+
+  - id: "GT-004"
+    language: python
+    ac: |
+      The system should reject duplicate email registrations.
+      POST /register with an existing email should return 409 Conflict.
+    code: |
+      @router.post("/register")
+      async def register(name: str = Body(...), email: str = Body(...)):
+          existing = await db.fetch_one(
+              "SELECT id FROM users WHERE email = :email", {"email": email}
+          )
+          if existing:
+              raise HTTPException(status_code=409, detail="Email already registered")
+          user_id = await db.execute(
+              "INSERT INTO users (name, email) VALUES (:name, :email)",
+              {"name": name, "email": email}
+          )
+          return {"id": user_id, "name": name, "email": email}
+    expected:
+      ac_status: "implemented"
+      explanation: "Checks for existing email before insert and returns 409 on duplicate."
+
+  - id: "GT-005"
+    language: python
+    ac: |
+      DELETE /users/:id should remove the user.
+      Returns 204 on success.
+      Returns 404 if user doesn't exist.
+    code: |
+      @router.delete("/users/{user_id}")
+      async def delete_user(user_id: int):
+          deleted = await db.execute(
+              "DELETE FROM users WHERE id = :id", {"id": user_id}
+          )
+          return {"deleted": deleted > 0}
+    expected:
+      ac_status: "wrong"
+      explanation: "Deletes user but returns 200 with JSON body instead of 204. Missing 404 for non-existent user."
+
+  - id: "GT-006"
+    language: python
+    ac: |
+      Password must be at least 8 characters long.
+      Registration should return 400 if password is too short.
+    code: |
+      @router.post("/register")
+      async def register(name: str, email: str, password: str = Body(...)):
+          if len(password) < 8:
+              raise HTTPException(status_code=400, detail="Password too short")
+          hashed = hash_password(password)
+          user_id = await db.execute(
+              "INSERT INTO users (name, email, password) VALUES (:name, :email, :pw)",
+              {"name": name, "email": email, "pw": hashed}
+          )
+          return {"id": user_id}
+    expected:
+      ac_status: "implemented"
+      explanation: "Checks password length and returns 400 if under 8 chars, hashes password before storing."
+
+  - id: "GT-007"
+    language: python
+    ac: |
+      API key should be masked in logs.
+      Log entries should show "api_key=***" instead of the actual key.
+    code: |
+      logger.info(f"Request from {request.client.host}, api_key={request.headers.get('X-API-Key')}")
+    expected:
+      ac_status: "missing"
+      explanation: "Logs the actual API key value instead of masking it."
+
+  - id: "GT-008"
+    language: python
+    ac: |
+      The search endpoint should return results ordered by relevance (match score descending).
+      Results must include a score field.
+    code: |
+      @router.get("/search")
+      async def search(q: str = Query(...)):
+          results = await db.fetch_all(
+              "SELECT id, title, content FROM documents WHERE content LIKE :q",
+              {"q": f"%{q}%"}
+          )
+          return {"results": [dict(r) for r in results]}
+    expected:
+      ac_status: "partial"
+      explanation: "Returns search results but no relevance ordering or score field. Basic LIKE query instead of full-text search."
+
+  - id: "GT-009"
+    language: python
+    ac: |
+      Rate limiting should allow 100 requests per minute per API key.
+      Exceeding limit should return 429 Too Many Requests.
+    code: |
+      @app.middleware("http")
+      async def rate_limit_middleware(request: Request, call_next):
+          api_key = request.headers.get("X-API-Key")
+          if api_key:
+              key = f"rate_limit:{api_key}"
+              count = await redis.incr(key)
+              if count == 1:
+                  await redis.expire(key, 60)
+              if count > 100:
+                  return JSONResponse(status_code=429, content={"error": "Rate limit exceeded"})
+          return await call_next(request)
+    expected:
+      ac_status: "implemented"
+      explanation: "Implements 100 req/min rate limiting per API key, returns 429 when exceeded."
+
+  - id: "GT-010"
+    language: python
+    ac: |
+      GET /health should return system status including database connectivity.
+      Response: {"status": "ok", "database": "connected"} or {"status": "degraded", "database": "disconnected"}
+    code: |
+      @router.get("/health")
+      async def health_check():
+          return {"status": "ok", "version": "1.0.0"}
+    expected:
+      ac_status: "partial"
+      explanation: "Returns 200 but doesn't check database connectivity. Missing database status field."
