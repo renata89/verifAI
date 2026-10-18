@@ -188,3 +188,90 @@ fixtures:
     expected:
       ac_status: "partial"
       explanation: "Returns 200 but doesn't check database connectivity. Missing database status field."
+
+  - id: "GT-011"
+    language: python
+    ac: |
+      After failed login (wrong password), increment failed_attempts counter.
+      After 5 failed attempts, lock the account for 15 minutes.
+    code: |
+      @router.post("/login")
+      async def login(email: str, password: str):
+          user = await find_user(email)
+          if not verify_password(password, user.password_hash):
+              user.failed_attempts += 1
+              await save_user(user)
+              return {"error": "Invalid password"}
+          user.failed_attempts = 0
+          await save_user(user)
+          return {"token": create_token(user)}
+    expected:
+      ac_status: "partial"
+      explanation: "Increments failed_attempts counter on bad password, but missing lockout logic after 5 attempts."
+
+  - id: "GT-012"
+    language: python
+    ac: |
+      All API responses must include a request_id header for tracing.
+      The request_id is generated on each request and returned in X-Request-Id header.
+    code: |
+      @app.middleware("http")
+      async def add_request_id(request: Request, call_next):
+          request_id = str(uuid4())
+          request.state.request_id = request_id
+          response = await call_next(request)
+          return response
+    expected:
+      ac_status: "missing"
+      explanation: "Generates request_id on the request but doesn't add it to the response headers."
+
+  - id: "GT-013"
+    language: python
+    ac: |
+      Pagination must use cursor-based (keyset) pagination, not offset-based.
+      Response includes next_cursor field if more results exist.
+    code: |
+      @router.get("/items")
+      async def get_items(page: int = 1, limit: int = 20):
+          offset = (page - 1) * limit
+          items = await db.fetch_all(
+              "SELECT * FROM items ORDER BY id LIMIT :limit OFFSET :offset",
+              {"limit": limit, "offset": offset}
+          )
+          return {"items": items, "page": page}
+    expected:
+      ac_status: "wrong"
+      explanation: "Uses offset-based pagination with page/limit, not cursor-based. Missing next_cursor field."
+
+  - id: "GT-014"
+    language: python
+    ac: |
+      When deleting a user, also cascade delete their posts and comments.
+      Use a database transaction to ensure atomicity.
+    code: |
+      @router.delete("/users/{user_id}")
+      async def delete_user(user_id: int):
+          async with db.transaction():
+              await db.execute("DELETE FROM comments WHERE user_id = :id", {"id": user_id})
+              await db.execute("DELETE FROM posts WHERE user_id = :id", {"id": user_id})
+              await db.execute("DELETE FROM users WHERE id = :id", {"id": user_id})
+          return {"status": "deleted"}
+    expected:
+      ac_status: "implemented"
+      explanation: "Cascade deletes comments and posts within a transaction before deleting the user."
+
+  - id: "GT-015"
+    language: python
+    ac: |
+      The export endpoint should allow downloading data as CSV or JSON.
+      Accept format parameter: ?format=csv or ?format=json.
+    code: |
+      @router.get("/export")
+      async def export_data():
+          data = await fetch_all_data()
+          csv_output = convert_to_csv(data)
+          return Response(content=csv_output, media_type="text/csv")
+    expected:
+      ac_status: "partial"
+      explanation: "Exports as CSV but doesn't support JSON format. Missing format parameter handling."
+

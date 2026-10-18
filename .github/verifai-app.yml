@@ -1,0 +1,17 @@
+# VerifAI — GitHub App Manifest
+# Creates a GitHub App that listens to PR events
+# https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-using-a-manifest
+
+name: "VerifAI"
+url: "https://github.com/renata89/verifAI"
+hook_attributes:
+  url: "https://verifai.dev/webhook/github"  # Replace with actual URL
+public: true
+default_events:
+  - pull_request
+  - pull_request_review
+default_permissions:
+  pull_requests: write
+  contents: read
+  issues: read
+  metadata: read
