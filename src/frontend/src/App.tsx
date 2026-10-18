@@ -41,15 +41,14 @@ function App() {
       if (resp.ok) {
         const data = await resp.json()
         setAnalyses(data)
-      } else {
-        // Demo data when backend isn't running
-        setAnalyses(getDemoData())
+        setLoading(false)
+        return
       }
     } catch {
-      setAnalyses(getDemoData())
-    } finally {
-      setLoading(false)
+      // Backend not running
     }
+    setAnalyses([])
+    setLoading(false)
   }
 
   function getDemoData(): Analysis[] {
