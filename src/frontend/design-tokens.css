@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════
+   VerifAI — Design System Tokens
+   Styl: profesjonalny, techniczny, czysty
+   Inspiracja: Vercel, Linear, Sentry
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ── Brand Colors ── */
+  --verifai-brand: #6366f1;        /* Indigo-500 — primary */
+  --verifai-brand-hover: #4f46e5;  /* Indigo-600 */
+  --verifai-brand-light: #eef2ff;  /* Indigo-50 */
+  --verifai-accent: #06b6d4;       /* Cyan-500 — secondary */
+  --verifai-accent-hover: #0891b2; /* Cyan-600 */
+
+  /* ── Status Colors ── */
+  --verifai-status-implemented: #22c55e;  /* Green */
+  --verifai-status-partial: #eab308;      /* Yellow */
+  --verifai-status-missing: #ef4444;      /* Red */
+  --verifai-status-wrong: #f97316;        /* Orange */
+
+  /* ── Surfaces ── */
+  --verifai-bg: #0a0a0f;           /* Deep near-black */
+  --verifai-bg-card: #13131a;      /* Card bg */
+  --verifai-bg-elevated: #1a1a24;  /* Elevated surfaces */
+  --verifai-border: #2a2a3a;       /* Borders */
+  --verifai-border-focus: #6366f1; /* Focus ring */
+
+  /* ── Typography ── */
+  --verifai-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --verifai-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --verifai-text-primary: #f1f5f9;
+  --verifai-text-secondary: #94a3b8;
+  --verifai-text-muted: #64748b;
+
+  /* ── Spacing ── */
+  --verifai-radius-sm: 6px;
+  --verifai-radius-md: 8px;
+  --verifai-radius-lg: 12px;
+}
+
+/* ═══════════════════════════════════════════
+   Component styles
+   ═══════════════════════════════════════════ */
+
+/* Card */
+.verifai-card {
+  background: var(--verifai-bg-card);
+  border: 1px solid var(--verifai-border);
+  border-radius: var(--verifai-radius-lg);
+  padding: 1.5rem;
+}
+
+/* Badge / Status */
+.verifai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--verifai-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.verifai-badge--implemented { background: #166534; color: #bbf7d0; }
+.verifai-badge--partial    { background: #713f12; color: #fef08a; }
+.verifai-badge--missing    { background: #7f1d1d; color: #fecaca; }
+.verifai-badge--wrong      { background: #7c2d12; color: #fed7aa; }
+
+/* Button */
+.verifai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--verifai-radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+.verifai-btn--primary {
+  background: var(--verifai-brand);
+  color: white;
+}
+.verifai-btn--primary:hover {
+  background: var(--verifai-brand-hover);
+}
+
+/* Score bar */
+.verifai-score {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--verifai-bg-elevated);
+  overflow: hidden;
+}
+.verifai-score__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
