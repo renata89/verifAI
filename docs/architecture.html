@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerifAI Architecture Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>VerifAI Architecture</h1>
+      </div>
+      <p class="subtitle">AI Traceability Engine — Requirements Verifier, Test Gap Analyzer, Documentation Drift Detector</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1100 750">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34d399" />
+          </marker>
+          <marker id="arrowhead-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- === CLOUD BOUNDARY === -->
+        <rect x="280" y="40" width="800" height="690" rx="12" fill="rgba(251, 191, 36, 0.05)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="292" y="58" fill="#fbbf24" font-size="10" font-weight="600">VerifAI Cloud</text>
+
+        <!-- === EXTERNAL: GitHub / GitLab === -->
+        <rect x="30" y="120" width="170" height="100" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="115" y="145" fill="white" font-size="11" font-weight="600" text-anchor="middle">Code Repositories</text>
+        <text x="115" y="162" fill="#94a3b8" font-size="9" text-anchor="middle">GitHub / GitLab</text>
+        <text x="115" y="176" fill="#94a3b8" font-size="9" text-anchor="middle">Webhooks + API</text>
+        <text x="115" y="190" fill="#94a3b8" font-size="9" text-anchor="middle">PRs, Commits, Issues</text>
+
+        <!-- === EXTERNAL: Jira / Linear === -->
+        <rect x="30" y="260" width="170" height="100" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="115" y="285" fill="white" font-size="11" font-weight="600" text-anchor="middle">Issue Trackers</text>
+        <text x="115" y="302" fill="#94a3b8" font-size="9" text-anchor="middle">Jira / Linear</text>
+        <text x="115" y="316" fill="#94a3b8" font-size="9" text-anchor="middle">User Stories</text>
+        <text x="115" y="330" fill="#94a3b8" font-size="9" text-anchor="middle">Acceptance Criteria</text>
+
+        <!-- Arrow: Repos → API -->
+        <line x1="200" y1="170" x2="278" y2="170" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowhead-cyan)"/>
+        <text x="239" y="164" fill="#94a3b8" font-size="9" text-anchor="middle">Webhook</text>
+
+        <!-- Arrow: Jira → API -->
+        <line x1="200" y1="310" x2="278" y2="310" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowhead-cyan)"/>
+        <text x="239" y="304" fill="#94a3b8" font-size="9" text-anchor="middle">REST API</text>
+
+        <!-- === API GATEWAY === -->
+        <rect x="320" y="140" width="160" height="60" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="400" y="165" fill="white" font-size="11" font-weight="600" text-anchor="middle">API Gateway</text>
+        <text x="400" y="182" fill="#94a3b8" font-size="9" text-anchor="middle">FastAPI :8000</text>
+
+        <!-- Arrow: API Gateway → Analyzer -->
+        <line x1="400" y1="200" x2="400" y2="278" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+        <text x="412" y="244" fill="#94a3b8" font-size="9">Dispatch</text>
+
+        <!-- === CORE: TRACE ENGINE === -->
+        <rect x="320" y="280" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="400" y="300" fill="white" font-size="11" font-weight="600" text-anchor="middle">Trace Engine</text>
+        <text x="400" y="316" fill="#94a3b8" font-size="9" text-anchor="middle">Core Processor</text>
+
+        <!-- === THREE MODULES === -->
+        <!-- Module 1: Requirements Verifier -->
+        <rect x="320" y="370" width="160" height="70" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="400" y="392" fill="white" font-size="10" font-weight="600" text-anchor="middle">Requirements</text>
+        <text x="400" y="408" fill="white" font-size="10" font-weight="600" text-anchor="middle">Verifier</text>
+        <text x="400" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">AC → Code match</text>
+
+        <!-- Module 2: Test Gap Analyzer -->
+        <rect x="520" y="370" width="160" height="70" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="600" y="392" fill="white" font-size="10" font-weight="600" text-anchor="middle">Test Gap</text>
+        <text x="600" y="408" fill="white" font-size="10" font-weight="600" text-anchor="middle">Analyzer</text>
+        <text x="600" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">AC → Test coverage</text>
+
+        <!-- Module 3: Documentation Drift -->
+        <rect x="720" y="370" width="160" height="70" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="800" y="392" fill="white" font-size="10" font-weight="600" text-anchor="middle">Documentation</text>
+        <text x="800" y="408" fill="white" font-size="10" font-weight="600" text-anchor="middle">Drift Detector</text>
+        <text x="800" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">Code → Docs sync</text>
+
+        <!-- Lines from Engine to Modules -->
+        <line x1="400" y1="330" x2="400" y2="368" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+        <line x1="440" y1="350" x2="520" y2="390" stroke="#34d399" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="440" y1="350" x2="720" y2="390" stroke="#34d399" stroke-width="1" stroke-dasharray="3,3"/>
+
+        <!-- === LLM LAYER === -->
+        <rect x="320" y="490" width="260" height="80" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="450" y="515" fill="white" font-size="11" font-weight="600" text-anchor="middle">LLM Core</text>
+        <text x="450" y="532" fill="#94a3b8" font-size="9" text-anchor="middle">OpenAI / Anthropic API</text>
+        <text x="450" y="548" fill="#94a3b8" font-size="9" text-anchor="middle">RAG + Code Analysis</text>
+        <text x="450" y="562" fill="#a78bfa" font-size="8" text-anchor="middle">prompt: "does code match AC?"</text>
+
+        <!-- Arrow: Modules → LLM -->
+        <line x1="400" y1="440" x2="400" y2="488" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="412" y="470" fill="#94a3b8" font-size="9">Analyze</text>
+
+        <!-- === DATABASE === -->
+        <rect x="720" y="490" width="160" height="60" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="800" y="515" fill="white" font-size="11" font-weight="600" text-anchor="middle">PostgreSQL</text>
+        <text x="800" y="532" fill="#94a3b8" font-size="9" text-anchor="middle">Results + Cache</text>
+
+        <!-- Arrow: Engine → DB -->
+        <line x1="480" y1="505" x2="718" y2="520" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="590" y="498" fill="#94a3b8" font-size="9">Store</text>
+
+        <!-- === FRONTEND === -->
+        <rect x="320" y="620" width="280" height="80" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="460" y="645" fill="white" font-size="12" font-weight="600" text-anchor="middle">Web Dashboard</text>
+        <text x="460" y="662" fill="#94a3b8" font-size="9" text-anchor="middle">React + TypeScript</text>
+        <text x="460" y="678" fill="#94a3b8" font-size="9" text-anchor="middle">PR Review Dashboard</text>
+        <text x="460" y="694" fill="#22d3ee" font-size="8" text-anchor="middle">app.verifai.dev</text>
+
+        <!-- Arrow: API → Frontend -->
+        <line x1="400" y1="370" x2="400" y2="410" stroke="#22d3ee" stroke-width="1" stroke-dasharray="3,3"/>
+        <!-- Arrow: API Gateway → Frontend -->
+        <path d="M 480 170 L 540 170 Q 560 170 560 190 L 560 618" fill="none" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowhead-cyan)" stroke-dasharray="5,3"/>
+        <text x="572" y="400" fill="#22d3ee" font-size="9">REST API</text>
+
+        <!-- === OUTPUT: PR COMMENT === -->
+        <rect x="680" y="620" width="200" height="80" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="780" y="642" fill="white" font-size="10" font-weight="600" text-anchor="middle">GitHub PR Comment</text>
+        <text x="780" y="660" fill="#94a3b8" font-size="8" text-anchor="middle">"AC #1: ✅ Implemented"</text>
+        <text x="780" y="674" fill="#94a3b8" font-size="8" text-anchor="middle">"AC #2: ❌ Missing"</text>
+        <text x="780" y="688" fill="#94a3b8" font-size="8" text-anchor="middle">"Test coverage: 60%"</text>
+
+        <!-- Arrow: Frontend → PR Comment -->
+        <line x1="600" y1="660" x2="678" y2="660" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <!-- Arrow: PR Comment → GitHub (back out) -->
+        <path d="M 780 700 L 780 720 Q 780 730 770 730 L 150 730 Q 140 730 140 720 L 140 222" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrowhead)" stroke-dasharray="4,4"/>
+        <text x="460" y="724" fill="#fbbf24" font-size="9">POST PR Review</text>
+
+        <!-- === LEGEND === -->
+        <text x="30" y="470" fill="white" font-size="10" font-weight="600">Legend</text>
+
+        <rect x="30" y="482" width="16" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="52" y="490" fill="#94a3b8" font-size="8">Frontend</text>
+
+        <rect x="30" y="498" width="16" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="52" y="506" fill="#94a3b8" font-size="8">Backend / Core</text>
+
+        <rect x="30" y="514" width="16" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="52" y="522" fill="#94a3b8" font-size="8">Cloud / Integration</text>
+
+        <rect x="30" y="530" width="16" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="52" y="538" fill="#94a3b8" font-size="8">Database / LLM</text>
+
+        <rect x="30" y="546" width="16" height="10" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="52" y="554" fill="#94a3b8" font-size="8">External Service</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>MVP — Requirements Verifier</h3>
+        </div>
+        <ul>
+          <li>• Listen to GitHub PR webhooks</li>
+          <li>• Parse AC from Jira/Linear tickets</li>
+          <li>• Analyze PR diff against AC</li>
+          <li>• Generate PR review comment</li>
+          <li>• Confidence score per AC</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>Phase 2 — Test Gap Analyzer</h3>
+        </div>
+        <ul>
+          <li>• Check test coverage for each AC</li>
+          <li>• Generate test case suggestions</li>
+          <li>• Acceptance + negative + edge tests</li>
+          <li>• Export to test framework format</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Phase 3 — Documentation Drift</h3>
+        </div>
+        <ul>
+          <li>• Monitor docs vs code consistency</li>
+          <li>• Detect stale documentation</li>
+          <li>• Auto-generate PR with doc fixes</li>
+          <li>• README, API docs, wiki support</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">
+      VerifAI • AI Traceability Engine • github.com/renata89/verifAI • Phase: MVP
+    </p>
+  </div>
+</body>
+</html>
