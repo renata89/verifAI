@@ -1,0 +1,4 @@
+1. Search returns paginated results
+2. Results ordered by relevance score
+3. Each result includes id, title, and score
+4. Empty query returns empty results
